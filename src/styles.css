@@ -5,17 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * Vela design system.
+ * Semantic tokens defined on :root / .dark; mapped to Tailwind via @theme inline.
+ * Themes swap by toggling the .dark class on <html>.
+ * Default accent is restrained slate-teal — never red.
  */
 
 @theme inline {
@@ -59,9 +52,41 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Vela semantic tokens */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-muted: var(--muted-fg);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-anchor: var(--anchor);
+  --color-underline-current: var(--underline-current);
+  --color-underline-read: var(--underline-read);
 }
 
 :root {
+  /* Vela: warm-neutral light */
+  --bg: oklch(0.985 0.008 80);
+  --surface: oklch(0.978 0.01 80);
+  --surface-2: oklch(0.95 0.012 80);
+  --text: oklch(0.22 0.02 60);
+  --muted-fg: oklch(0.5 0.015 70);
+  --line: oklch(0.9 0.012 80);
+  --accent: #2f7a78;
+  --anchor: var(--accent);
+  --underline-current: var(--accent);
+  --underline-read: oklch(0.78 0.015 70);
+  --selection: color-mix(in srgb, var(--accent) 18%, transparent);
+
+  /* typography knobs (overridden by PreferencesContext) */
+  --rsvp-font: ui-sans-serif, system-ui, sans-serif;
+  --rsvp-size: 72px;
+  --doc-font: ui-serif, Georgia, serif;
+  --doc-size: 17px;
+  --doc-line-height: 1.6;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -98,6 +123,18 @@
 }
 
 .dark {
+  --bg: oklch(0.18 0.008 260);
+  --surface: oklch(0.21 0.01 260);
+  --surface-2: oklch(0.25 0.012 260);
+  --text: oklch(0.92 0.008 80);
+  --muted-fg: oklch(0.68 0.015 80);
+  --line: oklch(0.3 0.012 260);
+  --accent: #6fb3b1;
+  --anchor: var(--accent);
+  --underline-current: var(--accent);
+  --underline-read: oklch(0.38 0.015 260);
+  --selection: color-mix(in srgb, var(--accent) 25%, transparent);
+
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
@@ -138,7 +175,12 @@
   }
 
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--doc-font);
+  }
+
+  ::selection {
+    background-color: var(--selection);
   }
 }
