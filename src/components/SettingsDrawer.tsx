@@ -90,6 +90,7 @@ const READ_OPTS: ReadonlyArray<{ value: ReadTreatment; label: string }> = [
 ];
 const THEME_OPTS: ReadonlyArray<{ value: Theme; label: string }> = [
   { value: 'light', label: 'Light' },
+  { value: 'sepia', label: 'Sepia' },
   { value: 'dark', label: 'Dark' },
   { value: 'system', label: 'System' },
 ];
