@@ -17,6 +17,7 @@ export const defaultPreferences: Preferences = {
     enabled: true,
     colour: 'var(--accent)',
     weight: 'bold',
+    focusGuide: true,
   },
   typography: {
     rsvp: { family: 'sans', size: 'XL' },

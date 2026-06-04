@@ -23,11 +23,26 @@ import type {
 import { MODE_RANGES } from '@/core/types';
 import { cn } from '@/lib/utils';
 
+// Curated OFL / Apache-licensed font list, grouped by category. The Select
+// renders the labels as plain strings — group prefixes (— Sans, — Serif…)
+// give the user clear visual grouping without needing optgroup support.
 const FONT_OPTS: ReadonlyArray<{ value: FontFamily; label: string }> = [
-  { value: 'sans', label: 'Sans' },
-  { value: 'serif', label: 'Serif' },
-  { value: 'mono', label: 'Mono' },
-  { value: 'dyslexia', label: 'Dyslexia' },
+  { value: 'system', label: 'System default' },
+  { value: 'inter', label: 'Sans · Inter' },
+  { value: 'source-sans-3', label: 'Sans · Source Sans 3' },
+  { value: 'ibm-plex-sans', label: 'Sans · IBM Plex Sans' },
+  { value: 'work-sans', label: 'Sans · Work Sans' },
+  { value: 'public-sans', label: 'Sans · Public Sans' },
+  { value: 'source-serif-4', label: 'Serif · Source Serif 4' },
+  { value: 'literata', label: 'Serif · Literata' },
+  { value: 'newsreader', label: 'Serif · Newsreader' },
+  { value: 'lora', label: 'Serif · Lora' },
+  { value: 'ibm-plex-serif', label: 'Serif · IBM Plex Serif' },
+  { value: 'jetbrains-mono', label: 'Mono · JetBrains Mono' },
+  { value: 'ibm-plex-mono', label: 'Mono · IBM Plex Mono' },
+  { value: 'source-code-pro', label: 'Mono · Source Code Pro' },
+  { value: 'atkinson-hyperlegible', label: 'Legibility · Atkinson Hyperlegible' },
+  { value: 'opendyslexic', label: 'Legibility · OpenDyslexic' },
 ];
 const SIZE_OPTS: ReadonlyArray<{ value: FontSize; label: string }> = [
   { value: 'S', label: 'S' },
@@ -244,6 +259,12 @@ export function SettingsDrawer({ open, onClose }: Props) {
                 onChange={(v) =>
                   update((p) => ({ ...p, anchor: { ...p.anchor, weight: v } }))
                 }
+              />
+            </PreferenceRow>
+            <PreferenceRow label="Focus guide" description="Faint ticks above and below the word">
+              <Toggle
+                checked={prefs.anchor.focusGuide}
+                onChange={(v) => update((p) => ({ ...p, anchor: { ...p.anchor, focusGuide: v } }))}
               />
             </PreferenceRow>
           </PreferenceGroup>

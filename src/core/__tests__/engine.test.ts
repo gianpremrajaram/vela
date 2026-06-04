@@ -16,7 +16,7 @@ function makePrefs(over: Partial<Preferences['reading']> = {}): Preferences {
       academicCapWarning: true,
       ...over,
     },
-    anchor: { enabled: true, colour: '#0aa', weight: 'bold' },
+    anchor: { enabled: true, colour: '#0aa', weight: 'bold', focusGuide: true },
     typography: {
       rsvp: { family: 'sans', size: 'L' },
       document: { family: 'serif', size: 'M', lineHeight: 'normal' },

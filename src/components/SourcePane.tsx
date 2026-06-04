@@ -7,10 +7,11 @@ import { cn } from '@/lib/utils';
 interface Props {
   doc: DocumentModel;
   currentIndex: number;
+  runStart: number;
   onSeek(tokenId: number): void;
 }
 
-export function SourcePane({ doc, currentIndex, onSeek }: Props) {
+export function SourcePane({ doc, currentIndex, runStart, onSeek }: Props) {
   const { prefs } = usePreferences();
   const { containerRef, isUserScrolling, isFollowingLive, scrollToTokenEl, updateLiveFlag } =
     useViewport();
@@ -122,15 +123,21 @@ export function SourcePane({ doc, currentIndex, onSeek }: Props) {
                   {p.tokens.map((t, i) => {
                     const isCurrent = t.id === currentIndex;
                     const isRead = t.id < currentIndex;
+                    const inRun = t.id >= runStart && t.id <= currentIndex;
                     const treatment =
                       isRead && prefs.source.readTreatment === 'fade'
                         ? 'opacity-50'
                         : isRead && prefs.source.readTreatment === 'dim'
                           ? 'opacity-70'
                           : '';
-                    const indicator =
-                      isCurrent && prefs.source.currentWordIndicator === 'highlight'
-                        ? 'bg-[color-mix(in_srgb,var(--accent)_22%,transparent)] rounded px-0.5'
+                    // Continuous run treatments: every token from runStart..current
+                    // gets the underline / highlight. The current token can use
+                    // a slightly stronger colour to mark the read-head.
+                    const highlight =
+                      inRun && prefs.source.currentWordIndicator === 'highlight'
+                        ? isCurrent
+                          ? 'bg-[color-mix(in_srgb,var(--accent)_28%,transparent)]'
+                          : 'bg-[color-mix(in_srgb,var(--accent)_16%,transparent)]'
                         : '';
                     return (
                       <span key={t.id}>
@@ -139,13 +146,15 @@ export function SourcePane({ doc, currentIndex, onSeek }: Props) {
                           className={cn(
                             'cursor-pointer transition-colors',
                             treatment,
-                            indicator,
+                            highlight,
                           )}
                           style={
-                            isCurrent && prefs.source.currentWordIndicator === 'underline'
+                            inRun && prefs.source.currentWordIndicator === 'underline'
                               ? {
                                   textDecoration: 'underline',
-                                  textDecorationColor: 'var(--underline-current)',
+                                  textDecorationColor: isCurrent
+                                    ? 'var(--underline-current)'
+                                    : 'var(--underline-read)',
                                   textDecorationThickness: underlineThicknessPx,
                                   textUnderlineOffset: '3px',
                                 }

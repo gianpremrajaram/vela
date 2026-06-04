@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { PreferencesProvider, usePreferences } from '@/lib/preferences/PreferencesContext';
 import { useReader } from '@/lib/reader/useReader';
 import { sampleProviders } from '@/core/sources/sampleProvider';
+import { fileProvider, isSupportedFile } from '@/core/sources/fileProvider';
 import type { DocumentModel } from '@/core/types';
 import type { SourceProvider } from '@/core/sources/types';
 import { TopBar } from './TopBar';
@@ -10,6 +11,7 @@ import { RSVPStage } from './RSVPStage';
 import { SourcePane } from './SourcePane';
 import { SettingsDrawer } from './SettingsDrawer';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
+import { OpenDocumentModal } from './OpenDocumentModal';
 
 export function VelaApp() {
   return (
@@ -23,7 +25,9 @@ function VelaShell() {
   const { prefs, update } = usePreferences();
   const [doc, setDoc] = useState<DocumentModel | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { snapshot, controls } = useReader(doc);
+  const [openDocOpen, setOpenDocOpen] = useState(false);
+  const [dropOverlay, setDropOverlay] = useState(false);
+  const { snapshot, controls, runStart } = useReader(doc);
 
   // Load the first sample on first mount so the UI is interactive immediately.
   useEffect(() => {
@@ -33,6 +37,35 @@ function VelaShell() {
 
   const onLoadSample = useCallback((p: SourceProvider) => {
     void p.load().then(setDoc);
+  }, []);
+
+  // Window-wide drag-and-drop. Any file dropped anywhere on the shell loads
+  // through fileProvider; unsupported types are silently ignored (the modal
+  // shows the same error if used).
+  useEffect(() => {
+    const onDragOver = (e: DragEvent) => {
+      if (!e.dataTransfer?.types.includes('Files')) return;
+      e.preventDefault();
+      setDropOverlay(true);
+    };
+    const onDragLeave = (e: DragEvent) => {
+      if ((e.target as HTMLElement)?.nodeName === 'HTML') setDropOverlay(false);
+    };
+    const onDrop = (e: DragEvent) => {
+      e.preventDefault();
+      setDropOverlay(false);
+      const f = e.dataTransfer?.files?.[0];
+      if (!f || !isSupportedFile(f)) return;
+      void fileProvider(f).load().then(setDoc).catch(() => undefined);
+    };
+    window.addEventListener('dragover', onDragOver);
+    window.addEventListener('dragleave', onDragLeave);
+    window.addEventListener('drop', onDrop);
+    return () => {
+      window.removeEventListener('dragover', onDragOver);
+      window.removeEventListener('dragleave', onDragLeave);
+      window.removeEventListener('drop', onDrop);
+    };
   }, []);
 
   const onSeekFraction = useCallback(
@@ -65,6 +98,7 @@ function VelaShell() {
         onPlayToggle={() => controls.toggle()}
         onSkip={(n) => controls.skip(n)}
         onOpenSettings={() => setSettingsOpen(true)}
+        onOpenDocument={() => setOpenDocOpen(true)}
         onLoadSample={onLoadSample}
       />
 
@@ -90,6 +124,7 @@ function VelaShell() {
               <SourcePane
                 doc={doc}
                 currentIndex={currentIndex}
+                runStart={runStart}
                 onSeek={(id) => controls.seek(id)}
               />
             }
@@ -102,6 +137,19 @@ function VelaShell() {
       </main>
 
       <SettingsDrawer open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <OpenDocumentModal
+        open={openDocOpen}
+        onClose={() => setOpenDocOpen(false)}
+        onLoaded={setDoc}
+      />
+
+      {dropOverlay && (
+        <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-[var(--accent)]/15 backdrop-blur-sm">
+          <div className="rounded-lg border-2 border-dashed border-[var(--accent)] bg-[var(--surface)] px-8 py-6 text-sm text-[var(--text)] shadow-lg">
+            Drop a PDF, DOCX, Markdown or text file to read it
+          </div>
+        </div>
+      )}
 
       <KeyboardShortcuts
         onToggle={() => controls.toggle()}

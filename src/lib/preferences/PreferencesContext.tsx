@@ -87,16 +87,60 @@ function applyTheme(theme: Theme) {
   root.classList.toggle('dark', dark);
 }
 
+// Font stacks for the licence-safe (OFL/Apache) curated list.
+// FOLLOW-UP (Claude Code): drop woff2 files under /public/fonts and add
+// matching @font-face blocks so these names resolve to embedded fonts
+// regardless of the user's OS. Until then, named families fall through to
+// the system stack and only render with the chosen face if the user has
+// it installed locally — perfectly acceptable for a scaffold.
+const SYSTEM_SANS = 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const SYSTEM_SERIF = 'ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif';
+const SYSTEM_MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+
 function fontStack(f: Preferences['typography']['rsvp']['family']): string {
   switch (f) {
+    case 'system':
+      return SYSTEM_SANS;
+    // Sans
+    case 'inter':
     case 'sans':
-      return 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      return `"Inter", ${SYSTEM_SANS}`;
+    case 'source-sans-3':
+      return `"Source Sans 3", "Source Sans Pro", ${SYSTEM_SANS}`;
+    case 'ibm-plex-sans':
+      return `"IBM Plex Sans", ${SYSTEM_SANS}`;
+    case 'work-sans':
+      return `"Work Sans", ${SYSTEM_SANS}`;
+    case 'public-sans':
+      return `"Public Sans", ${SYSTEM_SANS}`;
+    // Serif
+    case 'source-serif-4':
     case 'serif':
-      return 'ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif';
+      return `"Source Serif 4", "Source Serif Pro", ${SYSTEM_SERIF}`;
+    case 'literata':
+      return `"Literata", ${SYSTEM_SERIF}`;
+    case 'newsreader':
+      return `"Newsreader", ${SYSTEM_SERIF}`;
+    case 'lora':
+      return `"Lora", ${SYSTEM_SERIF}`;
+    case 'ibm-plex-serif':
+      return `"IBM Plex Serif", ${SYSTEM_SERIF}`;
+    // Mono
+    case 'jetbrains-mono':
     case 'mono':
-      return 'ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace';
+      return `"JetBrains Mono", ${SYSTEM_MONO}`;
+    case 'ibm-plex-mono':
+      return `"IBM Plex Mono", ${SYSTEM_MONO}`;
+    case 'source-code-pro':
+      return `"Source Code Pro", ${SYSTEM_MONO}`;
+    // Legibility
+    case 'atkinson-hyperlegible':
+      return `"Atkinson Hyperlegible", ${SYSTEM_SANS}`;
+    case 'opendyslexic':
     case 'dyslexia':
-      return '"OpenDyslexic", "Comic Sans MS", "Trebuchet MS", sans-serif';
+      return `"OpenDyslexic", "Comic Sans MS", "Trebuchet MS", sans-serif`;
+    default:
+      return SYSTEM_SANS;
   }
 }
 

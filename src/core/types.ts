@@ -4,7 +4,32 @@ export type Mode = 'comprehend' | 'accelerate' | 'skim';
 export type ChunkSize = 1 | 2 | 3;
 export type PunctuationIntensity = 'subtle' | 'standard' | 'strong';
 export type Theme = 'light' | 'dark' | 'system';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'dyslexia';
+export type FontFamily =
+  | 'system'
+  // Sans
+  | 'inter'
+  | 'source-sans-3'
+  | 'ibm-plex-sans'
+  | 'work-sans'
+  | 'public-sans'
+  // Serif
+  | 'source-serif-4'
+  | 'literata'
+  | 'newsreader'
+  | 'lora'
+  | 'ibm-plex-serif'
+  // Mono
+  | 'jetbrains-mono'
+  | 'ibm-plex-mono'
+  | 'source-code-pro'
+  // Legibility
+  | 'atkinson-hyperlegible'
+  | 'opendyslexic'
+  // Legacy aliases kept for backward-compat with saved preferences.
+  | 'sans'
+  | 'serif'
+  | 'mono'
+  | 'dyslexia';
 export type FontSize = 'S' | 'M' | 'L' | 'XL';
 export type LineHeight = 'compact' | 'normal' | 'relaxed';
 export type AnchorWeight = 'normal' | 'bold';
@@ -63,6 +88,7 @@ export interface AnchorPrefs {
   enabled: boolean;
   colour: string; // CSS colour string
   weight: AnchorWeight;
+  focusGuide: boolean;
 }
 
 export interface TypographyPanePrefs {
