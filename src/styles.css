@@ -64,6 +64,8 @@
   --color-anchor: var(--anchor);
   --color-underline-current: var(--underline-current);
   --color-underline-read: var(--underline-read);
+  --color-focus-box: var(--focus-box);
+  --color-focus-guide: var(--focus-guide);
 }
 
 :root {
@@ -78,6 +80,8 @@
   --anchor: var(--accent);
   --underline-current: var(--accent);
   --underline-read: oklch(0.78 0.015 70);
+  --focus-box: rgba(0, 0, 0, 0.10);
+  --focus-guide: rgba(0, 0, 0, 0.25);
   --selection: color-mix(in srgb, var(--accent) 18%, transparent);
 
   /* typography knobs (overridden by PreferencesContext) */
@@ -133,6 +137,8 @@
   --anchor: var(--accent);
   --underline-current: var(--accent);
   --underline-read: oklch(0.38 0.015 260);
+  --focus-box: rgba(255, 255, 255, 0.10);
+  --focus-guide: rgba(255, 255, 255, 0.30);
   --selection: color-mix(in srgb, var(--accent) 25%, transparent);
 
   --background: oklch(0.129 0.042 264.695);
