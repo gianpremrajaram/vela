@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { Token } from '@/core/types';
 import { usePreferences } from '@/lib/preferences/PreferencesContext';
 import { chunkAnchor } from '@/core/chunkAnchor';
@@ -30,6 +31,23 @@ export function RSVPStage({ chunk, progress, totalTokens, currentIndex, onSeekFr
   const showAnchor = prefs.anchor.enabled;
   const anchorWeight = prefs.anchor.weight === 'bold' ? 700 : 400;
   const boxWidth = FOCUS_BOX_WIDTH[size];
+
+  // Measure the anchor glyph's actual centre relative to the inline word
+  // and offset the whole word so the anchor sits exactly on focalX. This
+  // avoids the half-`ch` slot trick (which left a visible gap because most
+  // glyphs are narrower than 1ch).
+  const wordRef = useRef<HTMLSpanElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
+  const [offset, setOffset] = useState(0);
+  useLayoutEffect(() => {
+    const w = wordRef.current;
+    const a = anchorRef.current;
+    if (!w || !a) return;
+    const wb = w.getBoundingClientRect();
+    const ab = a.getBoundingClientRect();
+    const anchorCentre = ab.left + ab.width / 2 - wb.left;
+    setOffset(wb.width / 2 - anchorCentre);
+  }, [display, anchorIndex, prefs.typography.rsvp.family, prefs.typography.rsvp.size]);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center select-none">
@@ -69,59 +87,35 @@ export function RSVPStage({ chunk, progress, totalTokens, currentIndex, onSeekFr
           </div>
         )}
 
-        {/* Three-segment word, anchor centred on focalX via absolute positioning. */}
-        <div
-          className="relative"
+        {/* Single inline word; anchor glyph is measured and the whole word
+            is shifted so that glyph's centre lands on focalX. No padding or
+            half-ch tricks — glyphs are typeset flush against each other. */}
+        <span
+          ref={wordRef}
+          className="relative inline-block"
           style={{
             fontFamily: 'var(--rsvp-font)',
             fontSize: 'var(--rsvp-size)',
             lineHeight: 1.1,
             color: 'var(--text)',
-            whiteSpace: 'nowrap',
+            whiteSpace: 'pre',
             fontVariantLigatures: 'none',
-            width: 0,
+            transform: `translateX(${offset}px)`,
+            willChange: 'transform',
           }}
         >
+          {pre.replace(/ /g, '\u00A0')}
           <span
-            className="absolute"
+            ref={anchorRef}
             style={{
-              right: '50%',
-              top: 0,
-              transform: 'translateX(-0.5ch)',
-              whiteSpace: 'pre',
-              textAlign: 'right',
-            }}
-          >
-            {pre.replace(/ /g, '\u00A0')}
-          </span>
-          <span
-            className="absolute"
-            style={{
-              left: '50%',
-              top: 0,
-              transform: 'translateX(-50%)',
               color: showAnchor ? 'var(--anchor)' : 'inherit',
               fontWeight: showAnchor ? anchorWeight : 'inherit',
-              whiteSpace: 'pre',
-              minWidth: '1ch',
-              textAlign: 'center',
             }}
           >
             {anchorChar}
           </span>
-          <span
-            className="absolute"
-            style={{
-              left: '50%',
-              top: 0,
-              transform: 'translateX(0.5ch)',
-              whiteSpace: 'pre',
-              textAlign: 'left',
-            }}
-          >
-            {post.replace(/ /g, '\u00A0')}
-          </span>
-        </div>
+          {post.replace(/ /g, '\u00A0')}
+        </span>
       </div>
 
       {prefs.appearance.showProgressBar && (
@@ -148,7 +142,7 @@ function ProgressBar({
   totalTokens: number;
 }) {
   return (
-    <div className="w-full max-w-xl mt-12 px-6">
+    <div className="w-full max-w-xl mt-12 px-6 opacity-40 transition-opacity hover:opacity-90 focus-within:opacity-90">
       <div
         role="slider"
         aria-label="Reading position"
@@ -156,18 +150,18 @@ function ProgressBar({
         aria-valuemax={totalTokens}
         aria-valuenow={currentIndex}
         tabIndex={0}
-        className="relative h-1 w-full cursor-pointer rounded-full bg-[var(--line)]"
+        className="relative h-0.5 w-full cursor-pointer rounded-full bg-[var(--line)]"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           onSeekFraction((e.clientX - rect.left) / rect.width);
         }}
       >
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-[var(--accent)]"
+          className="absolute inset-y-0 left-0 rounded-full bg-[var(--muted-fg)]"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
-      <div className="mt-2 text-center text-xs text-[var(--muted-fg)] tabular-nums">
+      <div className="mt-2 text-center text-[10px] text-[var(--muted-fg)] tabular-nums">
         {currentIndex} / {totalTokens}
       </div>
     </div>
