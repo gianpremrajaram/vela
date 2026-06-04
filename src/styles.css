@@ -175,6 +175,28 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/*
+ * Sepia / paper reading theme.
+ * Warm cream background — light enough to remain low-strain in daylight,
+ * never dark beige. Same lighter-left / slightly-darker-right relationship
+ * as the light theme (bg > surface > surface-2 in lightness).
+ */
+.sepia {
+  --bg: oklch(0.965 0.022 85);
+  --surface: oklch(0.955 0.024 82);
+  --surface-2: oklch(0.92 0.028 80);
+  --text: oklch(0.30 0.025 60);
+  --muted-fg: oklch(0.52 0.025 65);
+  --line: oklch(0.86 0.025 80);
+  --accent: #8a5a2b;
+  --anchor: var(--accent);
+  --underline-current: var(--accent);
+  --underline-read: oklch(0.78 0.025 75);
+  --focus-box: rgba(80, 50, 20, 0.10);
+  --focus-guide: rgba(80, 50, 20, 0.28);
+  --selection: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

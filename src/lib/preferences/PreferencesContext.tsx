@@ -85,6 +85,7 @@ function applyTheme(theme: Theme) {
     theme === 'dark' ||
     (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   root.classList.toggle('dark', dark);
+  root.classList.toggle('sepia', theme === 'sepia');
 }
 
 // Font stacks for the licence-safe (OFL/Apache) curated list.

@@ -3,7 +3,7 @@
 export type Mode = 'comprehend' | 'accelerate' | 'skim';
 export type ChunkSize = 1 | 2 | 3;
 export type PunctuationIntensity = 'subtle' | 'standard' | 'strong';
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'sepia' | 'dark' | 'system';
 export type FontFamily =
   | 'system'
   // Sans
