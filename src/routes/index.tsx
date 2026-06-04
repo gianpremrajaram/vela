@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { VelaApp } from "@/components/VelaApp";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Vela — calm RSVP reading" },
