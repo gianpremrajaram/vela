@@ -261,6 +261,12 @@ export function SettingsDrawer({ open, onClose }: Props) {
                 }
               />
             </PreferenceRow>
+            <PreferenceRow label="Focus guide" description="Faint ticks above and below the word">
+              <Toggle
+                checked={prefs.anchor.focusGuide}
+                onChange={(v) => update((p) => ({ ...p, anchor: { ...p.anchor, focusGuide: v } }))}
+              />
+            </PreferenceRow>
           </PreferenceGroup>
 
           <PreferenceGroup title="Typography — RSVP stage">
