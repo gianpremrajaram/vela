@@ -10,6 +10,9 @@ export function useReader(doc: DocumentModel | null) {
 
   const engineRef = useRef<Engine | null>(null);
   const [snapshot, setSnapshot] = useState<EngineSnapshot | null>(null);
+  // runStart anchors the continuous read-run underline. Reset on any manual
+  // jump (seek, click-word, chip-jump, new document); untouched during play.
+  const [runStart, setRunStart] = useState(0);
 
   // Recreate engine when document changes.
   useEffect(() => {
@@ -26,6 +29,7 @@ export function useReader(doc: DocumentModel | null) {
     });
     engineRef.current = eng;
     setSnapshot(eng.getSnapshot());
+    setRunStart(0);
     return () => eng.dispose();
   }, [doc]);
 
@@ -39,8 +43,16 @@ export function useReader(doc: DocumentModel | null) {
       play: () => engineRef.current?.play(),
       pause: () => engineRef.current?.pause(),
       toggle: () => engineRef.current?.toggle(),
-      seek: (id: number) => engineRef.current?.seek(id),
-      skip: (n: number) => engineRef.current?.skip(n),
+      seek: (id: number) => {
+        engineRef.current?.seek(id);
+        setRunStart(Math.max(0, id));
+      },
+      skip: (n: number) => {
+        const cur = engineRef.current?.getSnapshot().state.index ?? 0;
+        const next = Math.max(0, cur + n);
+        engineRef.current?.seek(next);
+        setRunStart(next);
+      },
       setWpm: (n: number) => engineRef.current?.setWpm(n),
     }),
     [],
@@ -48,5 +60,5 @@ export function useReader(doc: DocumentModel | null) {
 
   const onSpaceToggle = useCallback(() => engineRef.current?.toggle(), []);
 
-  return { snapshot, controls, onSpaceToggle };
+  return { snapshot, controls, onSpaceToggle, runStart };
 }
